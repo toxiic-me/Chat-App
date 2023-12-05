@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"
+        integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+"
+        crossorigin="anonymous"></script>
+    <title id="title">Chat App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c&family=Space+Grotesk&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <nav>
+        <h2>
+            <i class="fa-solid fa-bolt"></i>
+            Real-Time Chatting
+            <i class="fa-solid fa-bolt"></i>
+        </h2>
+        
+        <!-- toggle menu btn -->
+        <button id="toggleMenu">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <ul id="links">
+            <li><a href="/">Chat</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact</a></li>
+        </ul>
+    </nav>
+    <h1>Global Chatbox</h1>
+    <!-- Msg box -->
+    <div class="main-box">
+    <div class="container" id="container">
+        <div class="message center">Developer: Hello :)</div>
+    </div>
+    <!-- Msg input -->
+    <div class="send">
+        <form action="#" id="send-container">
+            <input type="text" placeholder="Enter message here..." name="messageIpn" id="messageInp">
+            <button class="btn" id="sendBtn">SEND</button>
+        </form>
+    </div>
+</div>
+</body>
+<script>
+    
+    const toggleMenu = document.getElementById('toggleMenu');
+    const links = document.getElementById('links');
+    // toggle menu function
+toggleMenu.addEventListener('click',()=>{
+    console.log('Menu changed')
+    if(links.style.marginTop == '-65vh'){
+        links.style.transition = '1s';
+        links.style.marginTop = '11.3vh';
+    }else{
+        links.style.transition = '1s';
+        links.style.marginTop = '-65vh';
+    }
+})
+    const socket = io();
+    const form = document.getElementById('send-container');
+    const messageInput = document.getElementById('messageInp');
+    const messageContainer = document.getElementById('container');
+    const sendBtn = document.getElementById('sendBtn');
+    const title = document.getElementById('title');
+
+    const user = prompt('Enter your name to join'); 
+
+
+    const audio = new Audio('https://soundcloud.com/cakkefans6669/bereal-notification-sound?si=a29729bf10284573847f9041395de636&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing');
+
+    const append = (msg, pos) => {
+        const messageElement = document.createElement('div');
+        messageElement.innerText = msg;
+        messageElement.classList.add("message");
+        messageElement.classList.add(pos);
+        messageContainer.append(messageElement);
+        pos == 'left' ? audio.play() : audio.pause();
+    }
+    sendBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        let message = messageInput.value;
+        append(`You: ${message}`, 'right');
+        socket.emit('send', message);
+        messageInput.value = '';
+    })
+    if( user != null){
+        if(user == ''){
+            socket.emit('new-user-joined', 'Anonymous');
+        }else{
+            socket.emit('new-user-joined', user);
+        }
+    }else{
+    const user = prompt('Enter your name to join'); 
+
+    }
+    socket.on('user-joined', data => {
+        console.log(data + ' joined')
+        append(`${data} joined the chat.`, 'center')
+    });
+
+    socket.on('receive', data => {
+        append(`${data.name} : ${data.message}`, 'left');
+    })
+
+    socket.on('left', data => {
+        append(`${data} left the chat.`, 'center');
+    })
+
+    socket.on('showActive', activeUsers=>{
+        title.innerText = `Active: ${activeUsers}`;
+    })
+
+</script>
+<style>
+    *{
+    margin: 0;
+    padding: 0;
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    text-decoration: none;
+    overflow-x: hidden;
+    color: aliceblue;
+    font-size: 1rem;
+    overflow: hidden;
+}
+#toggleMenu{
+    display: none;
+}
+body{
+    background: url("https://4kwallpapers.com/images/walls/thumbs_3t/8324.png") no-repeat;
+    background-size: cover;
+    padding: 1rem 0rem 1rem 2rem;
+}
+
+nav{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+nav h2{
+    background: linear-gradient(rgb(224, 212, 212),skyblue,pink);
+    -webkit-background-clip: text;
+    color: transparent;
+    font-size: 1.1rem;
+}
+nav ul{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 50vw;
+}
+nav ul li a{
+    font-size: 1.1rem;
+    background: linear-gradient(rgb(224, 212, 212),skyblue,pink);
+    -webkit-background-clip: text;
+    color: transparent;
+}
+h1{
+    font-size: 2rem;
+    text-align: center;
+    margin-top: 1rem;
+    background: linear-gradient(lightpink,skyblue,gold);
+    -webkit-background-clip: text;
+    color: transparent;
+}
+.main-box{
+    width: 95vw;
+    height: 85vh;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+}
+.container{
+    background: url('https://images5.alphacoders.com/132/1325121.png') no-repeat;
+    background-size: cover;
+    width: 60%;
+    height: 60vh;
+    border-radius: 30px;
+    border: 1px solid aqua;
+    overflow-y: auto;
+    padding: 1rem;
+}
+.container::-webkit-scrollbar {
+    display: none;
+}
+.message{
+    background: linear-gradient(lightcyan,white,lightgreen);
+    -webkit-background-clip: text;
+    color: transparent;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 20px;
+    height: fit-content;
+    text-wrap: wrap;
+}
+.right{
+    float: right;
+    clear: both;
+    height: fit-content;
+    width: fit-content;
+}
+.left{
+    float: left;
+    clear: both;
+    height: fit-content;
+    width: fit-content;
+}
+.center{
+    float: left;
+    text-align: center;
+    width: 100%;
+    clear: both;
+    border: none;
+    background: linear-gradient(lightcoral,skyblue);
+    -webkit-background-clip: text;
+    color: transparent;
+
+}
+
+.send{
+    display: flex;
+    flex-direction: row;
+    height: fit-content;
+    justify-content: center; 
+    width: 60%;
+    overflow-y: hidden;
+    gap: 10px;
+}
+.send input{
+    width: 40vw;
+    height: fit-content;
+    padding: 5px 5px;
+    text-align: center;
+    border-radius: 20px;
+    background: none;
+    border: none;
+    border-bottom: 1px solid aqua;
+}
+.send button{
+    cursor: pointer;
+    padding: 7px 40px; 
+    border-radius: 20px;
+    background: none;
+    border: 1px solid aqua;
+    width: 8vw;
+    height: fit-content;
+} 
+body{
+        height: 100vh;
+    }
+    
+    .send form{
+        width: 80vw;
+        display: flex;
+        justify-content: space-evenly;
+        height: fit-content;
+      }
+      .send button{
+        width: fit-content;
+        height: fit-content;
+      }
+@media screen and (max-width: 1120px) {
+    body{
+        height: 100vh;
+    }
+    .main-box{
+        height: 80vh;
+    }
+  }
+  
+@media screen and (max-width: 890px) {
+    body{
+        height: 100vh;
+    }
+    .container{
+        margin-top: 2vh;
+        width: 80vw;
+        height: 50vh;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        translate: -50% -50%;
+    }
+    .send{
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        margin-top: 38vh;
+        translate: -50% -50%;
+        z-index: 10;
+        width: 100vw;
+        height: fit-content;
+      }
+      
+  }
+@media screen and (max-width: 800px){
+    #toggleMenu {
+        display: block;
+        width:8vw;
+        background: none;
+        box-sizing: border-box;
+        font-size: 1.8rem;
+        color:white;
+        font-weight: bolder;
+        border: none;
+    }
+    nav ul{
+        z-index: 99;
+        background: rgba(40, 61, 70, 0.374);
+        font-weight: bolder;
+        position: absolute;
+        left: 50%;
+        translate: -50%;
+        flex-direction: column;
+        gap: 2rem;
+        width: 100vw;
+        height: 40vh;
+        top: 0;
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+        border-bottom: 0.1px dashed yellowgreen;
+        border-top: 0.1px dashed yellowgreen;
+        margin-top: -65vh;
+    }
+}
+
+</style>
+
+</html>
