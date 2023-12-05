@@ -75,9 +75,7 @@ toggleMenu.addEventListener('click',()=>{
 
     const user = prompt('Enter your name to join'); 
 
-
-    const audio = new Audio('https://soundcloud.com/cakkefans6669/bereal-notification-sound?si=a29729bf10284573847f9041395de636&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing');
-
+    const audio = new Audio('./ting.mp3');
     const append = (msg, pos) => {
         const messageElement = document.createElement('div');
         messageElement.innerText = msg;
@@ -86,6 +84,7 @@ toggleMenu.addEventListener('click',()=>{
         messageContainer.append(messageElement);
         pos == 'left' ? audio.play() : audio.pause();
     }
+    
     sendBtn.addEventListener('click', (e) => {
         e.preventDefault();
         let message = messageInput.value;
@@ -106,6 +105,7 @@ toggleMenu.addEventListener('click',()=>{
     socket.on('user-joined', data => {
         console.log(data + ' joined')
         append(`${data} joined the chat.`, 'center')
+
     });
 
     socket.on('receive', data => {
@@ -113,7 +113,7 @@ toggleMenu.addEventListener('click',()=>{
     })
 
     socket.on('left', data => {
-        append(`${data} left the chat.`, 'center');
+        data != '' ? append(`${data} left the chat.`, 'center') : append(`Anonymous left the chat.`, 'center')
     })
 
     socket.on('showActive', activeUsers=>{
