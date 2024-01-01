@@ -67,10 +67,11 @@ const sendMsg = document.getElementById('sendMsg');
 const sendMail = async()=>{
     try{        
     await Email.send({
-        SecureToken : "5403260DDD6D68409105B733A1AAA3BD5932",
+        Host : "smtp.elasticemail.com",
+        Username : "iamtoxiicman@gmail.com",
+        Password : "5403260DDD6D68409105B733A1AAA3BD5932",
         To : 'iamtoxiicman@gmail.com',
         From : "iamtoxiicman@gmail.com",
-        Subject : "New Enquiry from Chat-App",
         Body : `
               <h3>Name: ${userName.value}</h3> <br>
               Email: ${userEmail.value}<br>
@@ -79,6 +80,17 @@ const sendMail = async()=>{
     }).then(
       message => console.log('Message Sent to Hanish.')
     );        
+//       await  Email.send({
+//     Host : "smtp.elasticemail.com",
+//     Username : "iamtoxiicman@gmail.com",
+//     Password : "5403260DDD6D68409105B733A1AAA3BD5932",
+//     To : 'iamtoxiicman@gmail.com',
+//     From : "iamtoxiicman@gmail.com",
+//     Subject : "This is the subject",
+//     Body : "And this is the body"
+// }).then(
+//   message => alert(message)
+// );
     }catch(err){
         alert(err);
     }
