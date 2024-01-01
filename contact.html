@@ -101,6 +101,7 @@ sendMsg.addEventListener('click',(e)=>{
     e.preventDefault();
     if( userName.value != '' && userPhone.value != '' && userEmail.value != '' && userMsg.value != '' ){
         sendMail();
+        alert('Message sent successfully.')
     }else{
         alert('Fill the form correctlty :)')
     }
